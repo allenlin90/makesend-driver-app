@@ -1,0 +1,29 @@
+#login_form {
+    border: 2px #ccc solid;
+    width: 80%;
+    padding: 1.2rem;
+    background: #fff;
+    border-radius: 1rem;
+}
+
+#login_form img {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+#login_form button {
+    display: block;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    #login_form {
+        max-width: 500px;
+    }
+
+    #login_form img {
+        display: block;
+        /* width: 500px; */
+        margin: 0 auto;
+    }
+}

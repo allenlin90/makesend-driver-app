@@ -1,0 +1,84 @@
+export function navigators(location = 'dashboard') {
+    const container = document.querySelector('.container');
+    const footer = document.querySelector('footer');
+    container.innerHTML = ``;
+    footer.innerHTML = `
+        <div class="navigator">
+            <div>
+                <a href="#scanner" class="" id="navi_scanner">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Scan</span>
+                </a>
+            </div>
+            <div>
+                <a href="#search" class="" id="navi_search">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </a>
+            </div>
+            <div>
+                <a href="#tasks" class="" id="navi_tasks">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                </a>
+            </div>
+            <div>
+                <a href="#setting" class="" id="navi_setting">
+                    <i class="fas fa-cog"></i>
+                    <span>Setting</span>
+                </a>
+            </div>
+            <div>
+                <a href="#" class="" id="navi_logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    `;
+    user_logout();
+    activeFeature(location);
+}
+
+function activeFeature(location) {
+    const scanner = document.querySelector('#navi_scanner');
+    const search = document.querySelector('#navi_search');
+    const tasks = document.querySelector('#navi_tasks');
+    const setting = document.querySelector('#navi_setting');
+    [tasks, search, scanner, setting].forEach((item) => {
+        item.classList.remove('selected');
+    });
+
+    switch (location) {
+        case 'dashboard':
+            search.classList.add('selected');
+            break;
+        case 'scanner':
+            scanner.classList.add('selected');
+            break;
+        case 'tasks':
+            tasks.classList.add('selected');
+            break;
+        case 'setting':
+            setting.classList.add('selected');
+            break;
+        default:
+            search.classList.add('selected');
+    }
+}
+
+function user_logout() {
+    const logoutBtn = document.querySelector('#navi_logout');
+    const body = document.querySelector('body');
+    const footer = document.querySelector('footer');
+    logoutBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        sessionStorage.clear();
+        localStorage.clear();
+        footer.innerHTML = ``;
+        body.style.backgroundColor = `rgba(0, 0, 0, 0.1)`;
+        const container = document.querySelector('.container');
+        container.style.justifyContent = `center`;
+        window.location.hash = ``;
+    })
+}

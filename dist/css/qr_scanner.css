@@ -1,0 +1,70 @@
+#qrcode_scanner {
+    display: flex;
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 3rem;
+    background-color: #fff;
+    /* grid-template-rows: 0.5fr 0.5fr 3fr 1fr; */
+    /* grid-template-columns: 1fr; */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#qrcode_scanner > div:first-child {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    padding: 10px;
+    background-color: #ffc107;
+    justify-content: center;
+    align-items: center;
+}
+
+#qrcode_scanner h1 {
+    font-size: bold;
+    margin: 0;
+    padding: 0;
+}
+
+#videoSelect {
+    width: 100%;
+    padding: 10px;
+}
+
+#qr-canvas {
+    margin: 0 auto;
+    padding: 1.3rem 0;
+    max-width: calc(100% - 20px);
+    max-height: 50vh;
+}
+
+#startScanBtn {
+    display: none;
+    height: 100%;
+    padding: 16px;
+}
+
+#startScanBtn p {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+#startScanBtn img {
+    height: 10rem;
+    /* height: 100%; */
+}
+
+#qr-result {
+    font-size: 1.2em;
+    padding: 1.4rem;
+    display: none;
+    height: 100%;
+}
+
+@media (min-width: 500px) {
+    #qrcode_scanner, #qr-result {
+        max-width: 500px;
+    }
+}
