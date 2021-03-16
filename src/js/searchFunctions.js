@@ -2,8 +2,8 @@ import { createSignaturePad } from './signaturePad.js';
 import { createImageUploader } from './uploadImage.js';
 import endpoints from './endpoints.js';
 import { generateHeaders } from './checkToken.js';
-const searchParcelByPhoneEndpoint = `${endpoints.host}/parcel`;
-const searchParcelByIdEndpoint = `https://api.airportels.ninja/api/waybill/detail`;
+const searchParcelByPhoneEndpoint = `${endpoints.searchParcelByPhone}`;
+const searchParcelByIdEndpoint = `${endpoints.searchParcelById}`;
 
 const state = {
     input: '',
@@ -65,8 +65,9 @@ async function searchParcelByPhone(phone) {
             }).then(res => res.json()).then(data => data);
             console.log(searchResults);
             state.parcels = searchResults.map((parcel) => {
-                const serviceDate = parcel.service_date.slice(0, 10);
-                parcel.service_date = serviceDate;
+                const serviceDate = new Date(Date.parse(parcel.service_date)).toLocaleDateString().split('/');
+                parcel.service_date = `${serviceDate[2]}-${serviceDate[0]}-${serviceDate[1]}`;
+                console.log(parcel.service_date);
                 return parcel;
             });
             if (state.parcels.length) {

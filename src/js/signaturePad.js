@@ -1,5 +1,7 @@
 import { userToken, generateHeaders } from './checkToken.js';
 import { userLogin } from './userLogin.js';
+import endpoints from './endpoints.js';
+const uploadEndpoint = endpoints.uploadEndpoint;
 
 export function createSignaturePad(shipmentId) {
     const footer = document.querySelector('footer')
@@ -148,7 +150,7 @@ export function createSignaturePad(shipmentId) {
         const token = userToken();
         if (token) {
             const headers = await generateHeaders();
-            const response = await fetch('https://api.airportels.ninja/api/msd/delivery/uploadPOD', {
+            const response = await fetch(uploadEndpoint, {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json',

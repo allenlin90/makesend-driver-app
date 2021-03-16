@@ -27,6 +27,9 @@ export function userLogin() {
                     <label class="form-check-label" for="remember_me">Remember me</label>
                 </div>
                 <button type="submit" class="btn btn-warning">Login</button>
+                <div>
+                    <a href="#resetpassword">Forget Password?</a>
+                </div>
             </form>
         </div>
     `;

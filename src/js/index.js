@@ -42,6 +42,8 @@ window.onload = async function () {
                 case '#setting':
                     navigators('setting');
                     break;
+                case '#resetpassword':
+                    break;
                 default:
                     window.location.hash = '';
             }

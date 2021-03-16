@@ -1,4 +1,7 @@
 import { userToken, generateHeaders } from './checkToken.js';
+import endpoints from './endpoints.js';
+
+const uploadEndpoint = endpoints.uploadEndpoint;
 
 const state = {
     files: [],
@@ -87,7 +90,7 @@ export function createImageUploader(shipmentId) {
         const token = userToken();
         const headers = await generateHeaders();
         if (token) {
-            await fetch('https://api.airportels.ninja/api/msd/delivery/uploadPOD', {
+            await fetch(uploadEndpoint, {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json',
