@@ -1,5 +1,5 @@
 const host = 'https://makesend-driver.herokuapp.com'//window.location.hostname === '127.0.0.1' || 'localhost' ? 'http://localhost:8080' : '';
-const apiEndpoint = `https://api.airportels.ninja`;
+const apiEndpoint = `https://api.airportels.asia`;
 const endpoints = {
     host,
     checkToken: `${apiEndpoint}/api/msd/authPing`,
