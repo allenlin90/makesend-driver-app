@@ -1,6 +1,19 @@
 import { handleSubmitEvent, handleInputEvent } from './searchFunctions.js';
+import { getParameterByName } from './helpers.js';
 
 export function searchFeatures() {
+    const location = window.location.hash.split('?')[0];
+    console.log(location);
+    const id = getParameterByName('id');
+    const parcelId = getParameterByName('parcelId');
+    console.log(`id: ${id}`);
+    console.log(`parcelId: ${parcelId}`);
+    const header = document.querySelector('header');
+    header.style.display = `block`;
+    header.innerHTML = `
+        <div id="header">Search parcel</div>
+    `;
+
     const container = document.querySelector('.container');
     container.style.justifyContent = `space-between`;
     container.innerHTML = `
@@ -13,20 +26,22 @@ export function searchFeatures() {
             <div id="search_bar">
                 <form action="">
                     <input class="form-control" id="receiver_phone" type="tel" name="receiver_phone" value=""
-                        inputmode="numeric" placeholder="E.g. 0632166699" autocomplete="off" pattern="[0-9]{10}">
+                        inputmode="numeric" placeholder="#0632166699" autocomplete="off" pattern="[0-9]{10}">
                     <button type="submit"><i class="fa fa-search"></i></button>
                 </form>
             </div>            
-            <div id="result_list">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Please search parcel by <br> <b>Receiver Phone</b> or <br> <b>Tracking ID</b></li>
-                </ul>
-            </div>
+        </div>            
+        <div id="result_list">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Please search parcel by <br> <b>Receiver Phone</b> or <br> <b>Tracking ID</b></li>
+            </ul>
         </div>
     </div>
     `;
+
     handleSubmitEvent();
     handleInputEvent();
+
     const searchByPhoneBtn = document.querySelector('#search_by_phone_btn');
     const searchByTrackingIdBtn = document.querySelector('#search_by_tracking_id_btn');
     const searchBar = document.querySelector('#search_bar');

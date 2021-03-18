@@ -28,7 +28,7 @@ export function userLogin() {
                 </div>
                 <button type="submit" class="btn btn-warning">Login</button>
                 <div>
-                    <a href="#resetpassword">Forget Password?</a>
+                    <a href="#forgetpassword">Forget Password?</a>
                 </div>
             </form>
         </div>

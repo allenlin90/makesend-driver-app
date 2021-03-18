@@ -36,8 +36,15 @@
 #qr-canvas {
     margin: 0 auto;
     padding: 1.3rem 0;
+    /* width: calc(100% - 20px); */
     max-width: calc(100% - 20px);
     max-height: 50vh;
+}
+
+#actionToResult{
+    display: none;
+    width: 100%;
+    padding: 0 1.4rem;
 }
 
 #startScanBtn {
@@ -52,8 +59,14 @@
 }
 
 #startScanBtn img {
+    display: block;
     height: 10rem;
-    /* height: 100%; */
+    padding: 0.2rem;
+    margin-bottom: 1rem;
+    border: #ccc 2px solid;
+    border-radius: 10%;
+    box-shadow: 5px 5px 5px 5px;
+    cursor: pointer;
 }
 
 #qr-result {
@@ -61,10 +74,65 @@
     padding: 1.4rem;
     display: none;
     height: 100%;
+    width: 100%;
+}
+
+#outputData {
+    width: 100%;
+    word-wrap: break-word;
 }
 
 @media (min-width: 500px) {
     #qrcode_scanner, #qr-result {
         max-width: 500px;
+    }
+}
+
+footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+.navigator {
+    margin: 0 auto;
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    background: #ffc107;
+    height: 56px;
+}
+
+.navigator div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navigator a {
+    color: rgb(100, 100, 100);
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0 12px;
+    min-width: 80px;
+    max-width: 168px;
+    margin: 0;
+}
+
+.navigator a > i {
+    display: block;
+}
+
+.navigator .selected {
+    color: #000;
+}
+
+@media (min-width: 500px) {
+    .navigator {
+        max-width: 500px;
+    }
+    footer {
+        margin-bottom: 2rem;
     }
 }

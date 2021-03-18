@@ -1,3 +1,5 @@
+import { getParameterByName } from './helpers.js';
+
 const state = {
     rearCameras: [],
     cameras: [],
@@ -21,6 +23,8 @@ export async function qrScanner() {
     container.style.justifyContent = `space-between`;
     container.innerHTML = `
         <div id="qrcode_scanner">
+            <!-- reference https://codesandbox.io/s/qr-code-scanner-ilrm9?file=/src/qrCodeScanner.js -->
+            <!-- https://www.sitepoint.com/create-qr-code-reader-mobile-website/ -->
             <div>
                 <h1>QR Code Scanner</h1>
             </div>
@@ -28,9 +32,14 @@ export async function qrScanner() {
                 <label for="videoSource">Change Camera</label>
                 <select id="videoSource" class="custom-select"></select>
             </div>
-            <canvas id="qr-canvas"></canvas>
+            <canvas id="qr-canvas" hidden></canvas>
             <div id="qr-result">
-                <b>Result:</b><span id="outputData"></span>
+                <b>Result: </b>
+                <p id="outputData">https://app.makesend.asia/tracking?t=PP2103151042875</p>
+            </div>
+            <div id="actionToResult">
+                <a href="#" class="btn btn-primary">action</a>
+                <hr>
             </div>
             <div id="startScanBtn">
                 <label>
@@ -41,14 +50,13 @@ export async function qrScanner() {
         </div>
     `;
 
-    const video = document.createElement("video");
-    state.video = video;
+    state.video = document.createElement("video");
     const canvasElement = document.querySelector("#qr-canvas");
     canvasElement.width = (canvasElement.offsetHeight / 3) * 4;
     const canvas = canvasElement.getContext("2d");
 
     const qrResult = document.querySelector("#qr-result");
-    const outputData = document.querySelector("#outputData");
+    // const outputData = document.querySelector("#outputData");
     const videoSelect = document.querySelector('#videoSource');
 
     const startScanBtn = document.querySelector('#startScanBtn');
@@ -61,10 +69,9 @@ export async function qrScanner() {
 
     startScanBtn.onclick = start;
 
-    function readResult(res) {
+    async function readResult(res) {
         if (res) {
             qrResult.style.display = `block`;
-            outputData.innerText = res;
             startScanBtn.style.display = `block`;
             state.scanning = false;
 
@@ -73,8 +80,64 @@ export async function qrScanner() {
             });
 
             canvasElement.hidden = true;
+
+            checkResult(res);
         }
     };
+
+    async function checkResult(result) {
+        const res = result.toString().trim().toLowerCase();
+        actionsToQR(res);
+    }
+
+    async function actionsToQR(res = '') {
+        // let res = document.querySelector('#outputData').innerText.trim().toLowerCase();
+        const parcelId = getParameterByName('id');
+
+        const trackingIdRegex = /.?((ex|st|pp)\d{13}).?/g.exec(res);
+        const outputData = document.querySelector('#outputData');
+        const actionToResult = document.querySelector('#actionToResult');
+        if (trackingIdRegex) {
+            const trackingId = trackingIdRegex[1].toUpperCase()
+            if (res.includes('http')) {
+                outputData.innerHTML = `
+                Parcel ID: <a href=${res}>${trackingId}</a>
+                `;
+            } else {
+                outputData.innerText = trackingId;
+            }
+            actionToResult.style.display = `block`;
+            const link = actionToResult.querySelector('a');
+            if (trackingId.includes('ST')) {
+                link.setAttribute('href', `#search?id=${trackingId}`);
+                link.innerText = `Update Delivery Status`;
+            } else if (trackingId.includes('PP')) {
+                const checkRegistration = true;
+                if (checkRegistration) {
+                    link.setAttribute('href', `#search?id=${trackingId}`);
+                    link.innerText = `Update Delivery Status`;
+                } else {
+                    const param = parcelId.length > 0 ? `&parcelId=${parcelId}` : ``;
+                    link.setAttribute('href', `#register?id=${trackingId}${param}`);
+                    link.innerText = `Register Parcel`;
+                    if (param && param.includes('EX')) {
+                        window.location.hash = `register?id=${trackingId}${param}`;
+                    }
+                }
+            } else if (trackingId.includes('EX')) {
+                link.setAttribute('href', `#search?id=${trackingId}`);
+                link.innerText = `Update Delivery Status`;
+            }
+        } else {
+            if (res.includes('http') || res.includes('www')) {
+                outputData.innerHTML = `
+               <a href=${res}>${res}</a>
+            `;
+            } else {
+                outputData.innerText = res;
+            }
+        }
+    }
 
     async function start() {
         qrResult.style.display = `none`;
@@ -116,6 +179,7 @@ export async function qrScanner() {
                             const videoSelectedValue = videoSelect.value;
                             videoSelect.innerHTML = '';
                             videoInputs.forEach((videoInput, index) => {
+                                console.log(videoInput);
                                 const option = document.createElement('option');
                                 option.value = videoInput.deviceId;
                                 option.text = videoInput.label || `camera ${index + 1}`;

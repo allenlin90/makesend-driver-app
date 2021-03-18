@@ -1,7 +1,10 @@
 #search_parcel {
     display: grid;
     width: 100%;
-    margin-top: 3rem;
+    height: calc(100% - 130px);
+    margin-top: 4rem;
+    grid-template-rows: 1fr 1.5fr 15fr;
+    background-color: #fff;
 }
 
 #search_functions {
@@ -12,12 +15,11 @@
 
 #search_list {
     width: 100%;
-    background: #fff;
 }
 
 #search_bar {
     display: block;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 #search_bar form {
@@ -49,11 +51,10 @@
 }
 
 #result_list {
-    padding: 1rem;
+    /* padding: 1rem; */
     padding-top: 0;
-    height: 50vh;
     overflow: auto;
-    
+    height: 100%;
 }
 
 #warning {
@@ -63,20 +64,16 @@
     z-index: 1;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 500px) {
     #search_parcel {
         max-width: 500px;
+        margin-top: 7rem;
+        height: calc(100% - 130px - 6rem);
     }
 }
 
-@media (min-height: 812px) and (max-height:1023px) {
+@media (min-height: 812px) {
     #result_list {
-        height: 60vh;
-    }
-}
-
-@media (min-height: 1024px) {
-    #result_list {
-        height: 70vh;
+        height: calc(100% - 130px - 6rem);
     }
 }

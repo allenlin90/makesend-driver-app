@@ -15,6 +15,7 @@ export async function generateHeaders() {
         return response;
     } catch (err) {
         console.log(err);
+        return null;
     }
 }
 

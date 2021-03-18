@@ -28,17 +28,28 @@ export function navigators(location = 'dashboard') {
                     <span>Setting</span>
                 </a>
             </div>
-            <div>
-                <a href="#" class="" id="navi_logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
         </div>
     `;
-    user_logout();
     activeFeature(location);
 }
+
+const setting = `
+<div>
+    <a href="#setting" class="" id="navi_setting">
+        <i class="fas fa-cog"></i>
+        <span>Setting</span>
+    </a>
+</div>
+`;
+
+const logout = `
+<div>
+    <a href="#" class="" id="navi_logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+    </a>
+</div>
+`;
 
 function activeFeature(location) {
     const scanner = document.querySelector('#navi_scanner');
@@ -65,20 +76,4 @@ function activeFeature(location) {
         default:
             search.classList.add('selected');
     }
-}
-
-function user_logout() {
-    const logoutBtn = document.querySelector('#navi_logout');
-    const body = document.querySelector('body');
-    const footer = document.querySelector('footer');
-    logoutBtn.addEventListener('click', function (event) {
-        event.stopPropagation();
-        sessionStorage.clear();
-        localStorage.clear();
-        footer.innerHTML = ``;
-        body.style.backgroundColor = `rgba(0, 0, 0, 0.1)`;
-        const container = document.querySelector('.container');
-        container.style.justifyContent = `center`;
-        window.location.hash = ``;
-    })
 }

@@ -4,7 +4,11 @@
 @import "signature_pad.css";
 @import "upload_image.css";
 @import "footer.css";
+@import "header.css";
 @import "qr_scanner.css";
+@import "forget_password.css";
+@import "reset_password.css";
+@import "user_setting.css";
 
 html, body {
     padding: 0;

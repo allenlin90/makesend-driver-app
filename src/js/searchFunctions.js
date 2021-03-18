@@ -29,7 +29,7 @@ export function handleInputEvent() {
         }
         const timeoutId = setTimeout(function () {
             searchParcel();
-        }, 500);
+        }, 300);
         state.timeoutId = timeoutId;
     }
 }
@@ -48,7 +48,6 @@ async function searchParcelByPhone(phone) {
     if (validPhone) {
         try {
             const headers = await generateHeaders();
-            console.log(headers);
             const searchResults = await fetch(searchParcelByPhoneEndpoint, {
                 method: 'POST',
                 mode: 'cors',
@@ -63,11 +62,9 @@ async function searchParcelByPhone(phone) {
                     receiver_phone: phone
                 })
             }).then(res => res.json()).then(data => data);
-            console.log(searchResults);
             state.parcels = searchResults.map((parcel) => {
                 const serviceDate = new Date(Date.parse(parcel.service_date)).toLocaleDateString().split('/');
                 parcel.service_date = `${serviceDate[2]}-${serviceDate[0]}-${serviceDate[1]}`;
-                console.log(parcel.service_date);
                 return parcel;
             });
             if (state.parcels.length) {
@@ -161,18 +158,20 @@ function listResults() {
                 btnType = 'primary';
         }
         const item = `
-        <div class="card" data-shipment-id="${parcel.shipmentID}">
-            <div class="card-body">
-                <h5 class="card-title">Parcel ID: ${parcel.shipmentID}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Service Date: ${parcel.service_date}</h6>
-                <h6 class="card-subtitle mb-2 text-muted">Delivery Status: ${parcel.status}</h6>
-                <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
-                <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
-                <p class="card-text">${parcel.note}</p>
-                <div class="card-link btn btn-primary" data-type="photo">Photo</div>
-                <div class="card-link btn btn-${btnType} ${btnActive}" data-type="signature">Singature</div>
+        <li class="list-group-item">
+            <div class="card" data-shipment-id="${parcel.shipmentID}">
+                <div class="card-body">
+                    <h5 class="card-title">Parcel ID: ${parcel.shipmentID}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Service Date: ${parcel.service_date}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Delivery Status: ${parcel.status}</h6>
+                    <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
+                    <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
+                    <p class="card-text">${parcel.note}</p>
+                    <div class="card-link btn btn-primary" data-type="photo">Photo</div>
+                    <div class="card-link btn btn-${btnType} ${btnActive}" data-type="signature">Singature</div>
+                </div>
             </div>
-        </div>
+        </li>
         `;
         return item;
     }).join('');
@@ -204,5 +203,5 @@ function errAlert(errMessage) {
     `;
     setTimeout(function () {
         header.innerHTML = ``;
-    }, 5000);
+    }, 30);
 }

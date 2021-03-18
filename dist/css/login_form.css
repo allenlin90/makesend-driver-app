@@ -16,6 +16,13 @@
     margin: 0 auto;
 }
 
+form > div:last-child {
+    margin: 1rem auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @media (min-width: 768px) {
     #login_form {
         max-width: 500px;
