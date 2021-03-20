@@ -81,7 +81,7 @@ async function searchParcelByPhone(phone) {
     }
 }
 
-async function searchParcelById(id) { // EX2101181126620
+export async function searchParcelById(id) { // EX2101181126620
     const shipmentId = /^[eE][xX]\d{13}/g.exec(id);
     if (shipmentId) {
         try {
@@ -130,6 +130,7 @@ function listErrorResult() {
 }
 
 function listResults() {
+    console.log(state.parcels);
     const parcels = state.parcels.map(parcel => {
         let btnType = ''
         let btnActive = ''
@@ -178,18 +179,19 @@ function listResults() {
     document.querySelector('#result_list ul').innerHTML = parcels;
     const parcelCards = [...document.querySelector('.list-group.list-group-flush').children];
     parcelCards.forEach((parcelCard) => {
-        const uploadSignatureBtn = parcelCard.querySelector('div[data-type=signature]')
+        const uploadSignatureBtn = parcelCard.querySelector('div[data-type=signature]');
+        const card = parcelCard.querySelector('.card');
         uploadSignatureBtn.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            createSignaturePad(parcelCard.dataset.shipmentId);
+            createSignaturePad(card.dataset.shipmentId);
         });
 
         const uploadImageBtn = parcelCard.querySelector('div[data-type=photo]');
         uploadImageBtn.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            createImageUploader(parcelCard.dataset.shipmentId);
+            createImageUploader(card.dataset.shipmentId);
         });
     });
 }

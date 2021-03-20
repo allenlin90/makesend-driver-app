@@ -1,18 +1,41 @@
-import { handleSubmitEvent, handleInputEvent } from './searchFunctions.js';
+import { handleSubmitEvent, handleInputEvent, searchParcelById } from './searchFunctions.js';
 import { getParameterByName } from './helpers.js';
 
+const state = {
+    id: null,
+    parcelId: null
+}
+
 export function searchFeatures() {
-    const location = window.location.hash.split('?')[0];
-    console.log(location);
-    const id = getParameterByName('id');
-    const parcelId = getParameterByName('parcelId');
-    console.log(`id: ${id}`);
-    console.log(`parcelId: ${parcelId}`);
+    
     const header = document.querySelector('header');
     header.style.display = `block`;
     header.innerHTML = `
         <div id="header">Search parcel</div>
     `;
+
+    const searchInputByTrackingId = `
+    <form action="" class="form-group">
+        <input class="form-control" id="tracking_id" type="text" name="tracking_id" value=""
+            placeholder="#EX1234567890123" autocomplete="off">
+        <button type="submit"><i class="fa fa-search"></i></button>        
+    </form>
+    `;
+
+    const searchInputByPhone = `
+    <form action="">
+        <input class="form-control" id="receiver_phone" type="tel" name="receiver_phone" value=""
+            inputmode="numeric" placeholder="#0632166699" autocomplete="off" pattern="[0-9]{10}">
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+    `;
+
+    let searchForm = searchInputByPhone;
+    const location = window.location.hash.split('?')[0];
+    state.id = getParameterByName('id');
+    state.parcelId = getParameterByName('parcelId');
+
+    location.includes('trackingid') ? searchForm = searchInputByTrackingId : searchForm = searchInputByPhone;
 
     const container = document.querySelector('.container');
     container.style.justifyContent = `space-between`;
@@ -24,11 +47,7 @@ export function searchFeatures() {
         </div>
         <div id="search_list">
             <div id="search_bar">
-                <form action="">
-                    <input class="form-control" id="receiver_phone" type="tel" name="receiver_phone" value=""
-                        inputmode="numeric" placeholder="#0632166699" autocomplete="off" pattern="[0-9]{10}">
-                    <button type="submit"><i class="fa fa-search"></i></button>
-                </form>
+                ${searchForm}
             </div>            
         </div>            
         <div id="result_list">
@@ -42,25 +61,15 @@ export function searchFeatures() {
     handleSubmitEvent();
     handleInputEvent();
 
+    if (state.id) {
+        const searchBar = document.querySelector('#search_bar');
+        searchBar.querySelector('input').value = state.id;
+        searchParcelById(state.id);
+    }    
+
     const searchByPhoneBtn = document.querySelector('#search_by_phone_btn');
     const searchByTrackingIdBtn = document.querySelector('#search_by_tracking_id_btn');
-    const searchBar = document.querySelector('#search_bar');
-
-    const searchInputByTrackingId = `
-    <form action="" class="form-group">
-        <input class="form-control" id="tracking_id" type="text" name="tracking_id" value=""
-            placeholder="#EX1234567890123" autocomplete="off">
-        <button type="submit"><i class="fa fa-search"></i></button>        
-    </form>
-    `;
-
-    const searchInputByPhone = `
-    <form action="">
-        <input class="form-control" id="receiver_phone" type="tel" name="receiver_phone" value=""
-            inputmode="numeric" placeholder="E.g. 0632166699" autocomplete="off" pattern="[0-9]{10}">
-        <button type="submit"><i class="fa fa-search"></i></button>
-    </form>
-    `;
+    
 
     searchByPhoneBtn.addEventListener('click', addSearchInput);
     searchByTrackingIdBtn.addEventListener('click', addSearchInput);
@@ -78,9 +87,9 @@ export function searchFeatures() {
             }
         });
         if (this.id === 'search_by_tracking_id_btn') {
-            searchBar.innerHTML = searchInputByTrackingId;
+            window.location.hash = 'search/trackingid';
         } else if (this.id === 'search_by_phone_btn') {
-            searchBar.innerHTML = searchInputByPhone;
+            window.location.hash = 'search/phone';
         }
         document.querySelector('#result_list ul').innerHTML = `<li class="list-group-item">Please search parcel by <br> <b>Receiver Phone</b> or <br> <b>Tracking ID</b></li>`;
         handleSubmitEvent();

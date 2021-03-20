@@ -40,15 +40,8 @@ window.onload = async function () {
                 navigators('scanner');
                 qrScanner();
             } else if (hash.includes(`#search`)) {
-                if (hash.includes(`phone`)) {
-                    navigators('search');
-                    searchFeatures();
-                } else if (hash.includes(`trackid`)) {
-
-                } else {
-                    navigators('search');
-                    searchFeatures();
-                }
+                navigators('search');
+                searchFeatures();
             } else if (hash.includes(`#tasks`)) {
                 navigators('tasks');
             } else if (hash.includes(`#setting`)) {
