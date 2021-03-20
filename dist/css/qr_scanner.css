@@ -1,25 +1,17 @@
 #qrcode_scanner {
-    display: flex;
+    display: grid;
+    /* grid-template-rows: 1fr 1fr 8fr; */
+    /* grid-template-columns: 1fr; */
     text-align: center;
     width: 100%;
+    height: calc(100% - 130px);
     margin: 0 auto;
-    margin-top: 3rem;
+    margin-top: 4rem;
     background-color: #fff;
-    /* grid-template-rows: 0.5fr 0.5fr 3fr 1fr; */
-    /* grid-template-columns: 1fr; */
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-#qrcode_scanner > div:first-child {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    padding: 10px;
-    background-color: #ffc107;
-    justify-content: center;
-    align-items: center;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #qrcode_scanner h1 {
@@ -71,68 +63,26 @@
 
 #qr-result {
     font-size: 1.2em;
-    padding: 1.4rem;
+    padding: 1rem;
     display: none;
     height: 100%;
     width: 100%;
 }
 
-#outputData {
-    width: 100%;
-    word-wrap: break-word;
-}
-
-@media (min-width: 500px) {
-    #qrcode_scanner, #qr-result {
-        max-width: 500px;
-    }
-}
-
-footer {
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
-
-.navigator {
+#qr-result p {
     margin: 0 auto;
-    display: grid;
+}
+
+#output_data {
     width: 100%;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    background: #ffc107;
-    height: 56px;
-}
-
-.navigator div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.navigator a {
-    color: rgb(100, 100, 100);
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 0 12px;
-    min-width: 80px;
-    max-width: 168px;
-    margin: 0;
-}
-
-.navigator a > i {
-    display: block;
-}
-
-.navigator .selected {
-    color: #000;
+    display: inline-block;
+    word-break: break-word;
 }
 
 @media (min-width: 500px) {
-    .navigator {
+    #qrcode_scanner {
+        margin-top: 7rem;
         max-width: 500px;
-    }
-    footer {
-        margin-bottom: 2rem;
+        max-height: calc(100% - 130px - 6rem);
     }
 }

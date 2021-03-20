@@ -1,3 +1,5 @@
+import { stopStream } from './qrScanner.js';
+
 export function navigators(location = 'dashboard') {
     const container = document.querySelector('.container');
     const footer = document.querySelector('footer');

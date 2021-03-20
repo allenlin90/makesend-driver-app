@@ -3,7 +3,7 @@
     width: 100%;
     height: calc(100% - 130px);
     margin-top: 4rem;
-    grid-template-rows: 1fr 1.5fr 15fr;
+    grid-template-rows: 1fr 1.5fr 1.5fr 15fr;
     background-color: #fff;
 }
 
@@ -53,8 +53,9 @@
 #result_list {
     /* padding: 1rem; */
     padding-top: 0;
-    overflow: auto;
     height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #warning {

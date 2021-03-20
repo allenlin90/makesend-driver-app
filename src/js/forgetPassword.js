@@ -1,5 +1,5 @@
 import endpoints from './endpoints.js';
-import { generateHeaders } from './checkToken';
+import { generateHeaders } from './checkToken.js';
 
 const defaultPendingTime = 60;
 const state = {

@@ -1,6 +1,6 @@
 // import { fetchHeader, changePassword, verifyOTP, requestOTP } from '../main.js';
 import { generateHeaders, userToken } from "./checkToken.js";
-import endpoints from './endpoints';
+import endpoints from './endpoints.js';
 
 const defaultPendingTime = 60;
 const state = {

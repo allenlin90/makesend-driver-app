@@ -1,33 +1,52 @@
-import { getParameterByName } from './helpers.js';
+import {
+    checkPreprintId,
+    registerPreprintId,
+    checkParcelStatus,
+    actionsToQR
+} from './trackingIdHandlers.js';
+
+// checkPreprintId('PP2103161318148');
+// registerPreprintId('PP2103161318148', 'EX2103091044393');
 
 const state = {
     rearCameras: [],
     cameras: [],
     appleDevice: null,
     scanning: false,
-    video: null
+    video: null,
+    stream: null
 }
 
 export function stopStream() {
     if (state.scanning) {
-        state.video.srcObject.getTracks().forEach(track => {
-            track.stop();
-        });
+        if (state.video) {
+            state.video.srcObject.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
+        if (state.stream) {
+            state.stream.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
         state.scanning = false;
         state.video = null;
+        state.stream = null;
+        const canvasElement = document.querySelector("#qr-canvas");
+        canvasElement.hidden = true;
     }
 }
 
 export async function qrScanner() {
+    const header = document.querySelector('header');
+    header.style.display = `block`;
+    header.innerHTML = `
+        <div id="header">QR Reader</div>
+    `;
     const container = document.querySelector(".container");
     container.style.justifyContent = `space-between`;
     container.innerHTML = `
         <div id="qrcode_scanner">
-            <!-- reference https://codesandbox.io/s/qr-code-scanner-ilrm9?file=/src/qrCodeScanner.js -->
-            <!-- https://www.sitepoint.com/create-qr-code-reader-mobile-website/ -->
-            <div>
-                <h1>QR Code Scanner</h1>
-            </div>
             <div id="videoSelect">
                 <label for="videoSource">Change Camera</label>
                 <select id="videoSource" class="custom-select"></select>
@@ -35,7 +54,8 @@ export async function qrScanner() {
             <canvas id="qr-canvas" hidden></canvas>
             <div id="qr-result">
                 <b>Result: </b>
-                <p id="outputData">https://app.makesend.asia/tracking?t=PP2103151042875</p>
+                <p id="output_data">https://app.makesend.asia/tracking?t=PP2103151042875</p>
+                <p id="parcel_status">Status: <span>pending</span></p>
             </div>
             <div id="actionToResult">
                 <a href="#" class="btn btn-primary">action</a>
@@ -56,14 +76,17 @@ export async function qrScanner() {
     const canvas = canvasElement.getContext("2d");
 
     const qrResult = document.querySelector("#qr-result");
-    // const outputData = document.querySelector("#outputData");
     const videoSelect = document.querySelector('#videoSource');
+    const actionToResult = document.querySelector('#actionToResult');
 
     const startScanBtn = document.querySelector('#startScanBtn');
 
     videoSelect.onchange = start;
     await checkDevices();
-    start();
+    await start();
+    // readResult('PP2103161318148'); // registered delivered
+    // readResult('EX2103091044393'); // delivered
+    // readResult('EX2012201138960'); // pending
 
     qrcode.callback = readResult;
 
@@ -73,11 +96,16 @@ export async function qrScanner() {
         if (res) {
             qrResult.style.display = `block`;
             startScanBtn.style.display = `block`;
-            state.scanning = false;
 
-            state.video.srcObject.getTracks().forEach(track => {
-                track.stop();
-            });
+            if (state.scanning) {
+                state.video.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                });
+                state.stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            state.scanning = false;
 
             canvasElement.hidden = true;
 
@@ -90,63 +118,15 @@ export async function qrScanner() {
         actionsToQR(res);
     }
 
-    async function actionsToQR(res = '') {
-        // let res = document.querySelector('#outputData').innerText.trim().toLowerCase();
-        const parcelId = getParameterByName('id');
-
-        const trackingIdRegex = /.?((ex|st|pp)\d{13}).?/g.exec(res);
-        const outputData = document.querySelector('#outputData');
-        const actionToResult = document.querySelector('#actionToResult');
-        if (trackingIdRegex) {
-            const trackingId = trackingIdRegex[1].toUpperCase()
-            if (res.includes('http')) {
-                outputData.innerHTML = `
-                Parcel ID: <a href=${res}>${trackingId}</a>
-                `;
-            } else {
-                outputData.innerText = trackingId;
-            }
-            actionToResult.style.display = `block`;
-            const link = actionToResult.querySelector('a');
-            if (trackingId.includes('ST')) {
-                link.setAttribute('href', `#search?id=${trackingId}`);
-                link.innerText = `Update Delivery Status`;
-            } else if (trackingId.includes('PP')) {
-                const checkRegistration = true;
-                if (checkRegistration) {
-                    link.setAttribute('href', `#search?id=${trackingId}`);
-                    link.innerText = `Update Delivery Status`;
-                } else {
-                    const param = parcelId.length > 0 ? `&parcelId=${parcelId}` : ``;
-                    link.setAttribute('href', `#register?id=${trackingId}${param}`);
-                    link.innerText = `Register Parcel`;
-                    if (param && param.includes('EX')) {
-                        window.location.hash = `register?id=${trackingId}${param}`;
-                    }
-                }
-            } else if (trackingId.includes('EX')) {
-                link.setAttribute('href', `#search?id=${trackingId}`);
-                link.innerText = `Update Delivery Status`;
-            }
-        } else {
-            if (res.includes('http') || res.includes('www')) {
-                outputData.innerHTML = `
-               <a href=${res}>${res}</a>
-            `;
-            } else {
-                outputData.innerText = res;
-            }
-        }
-    }
-
     async function start() {
         qrResult.style.display = `none`;
         startScanBtn.style.display = `none`;
+        actionToResult.style.display = `none`;
         canvasElement.hidden = false;
         if (/iphone|ipad|mac|apple|os\sx/.test(deviceAgent().toLowerCase())) {
             try {
-                if (window.stream) {
-                    window.stream.getTracks().forEach(track => {
+                if (state.stream) {
+                    state.stream.getTracks().forEach(track => {
                         track.stop();
                     });
                 }
@@ -196,8 +176,8 @@ export async function qrScanner() {
             }
         } else {
             try {
-                if (window.stream) {
-                    window.stream.getTracks().forEach(track => {
+                if (state.stream) {
+                    state.stream.getTracks().forEach(track => {
                         track.stop();
                     });
                 }
@@ -251,7 +231,7 @@ export async function qrScanner() {
     }
 
     function gotStream(stream) {
-        window.stream = stream; // make stream available to console
+        state.stream = stream; // make stream available to console
         state.scanning = true;
 
         state.video.setAttribute("playsinline", true);
@@ -275,11 +255,13 @@ export async function qrScanner() {
     }
 
     function tick() {
-        canvasElement.height = state.video.videoHeight;
-        canvasElement.width = state.video.videoWidth;
-        canvas.drawImage(state.video, 0, 0, canvasElement.width, canvasElement.height);
+        if (state.scanning) {
+            canvasElement.height = state.video.videoHeight;
+            canvasElement.width = state.video.videoWidth;
+            canvas.drawImage(state.video, 0, 0, canvasElement.width, canvasElement.height);
 
-        state.scanning && requestAnimationFrame(tick);
+            state.scanning && requestAnimationFrame(tick);
+        }
     }
 
     function scan() {

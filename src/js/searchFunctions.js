@@ -92,17 +92,22 @@ export async function searchParcelById(id) { // EX2101181126620
                 headers: {
                     'Content-Type': 'application/json',
                     'User-Token': `${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
-                    'client-token': headers['client-token'],
-                    'time-stamp': headers['time-stamp'],
-                    'time-signature': headers['time-signature']
+                    'Client-Token': headers['Client-Token'],
+                    'Time-Stamp': headers['Time-Stamp'],
+                    'Time-Signature': headers['Time-Signature']
                 },
                 body: JSON.stringify({
-                    shipmentIDs: [shipmentId[0]]
+                    trackingId: shipmentId[0]
                 })
             }).then(res => res.json()).then(data => data);
-            state.parcels = searchResults.results;
+            state.parcels = searchResults.map((parcel) => {
+                const serviceDate = new Date(Date.parse(parcel.service_date)).toLocaleDateString().split('/');
+                parcel.service_date = `${serviceDate[2]}-${serviceDate[0]}-${serviceDate[1]}`;
+                return parcel;
+            });
             if (state.parcels.length) {
                 listResults();
+                return searchResults;
             } else {
                 listErrorResult();
             }
@@ -168,7 +173,7 @@ function listResults() {
                     <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
                     <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
                     <p class="card-text">${parcel.note}</p>
-                    <div class="card-link btn btn-primary" data-type="photo">Photo</div>
+                    <div class="card-link btn btn-${btnType} ${btnActive}" data-type="photo">Photo</div>
                     <div class="card-link btn btn-${btnType} ${btnActive}" data-type="signature">Singature</div>
                 </div>
             </div>
@@ -179,8 +184,8 @@ function listResults() {
     document.querySelector('#result_list ul').innerHTML = parcels;
     const parcelCards = [...document.querySelector('.list-group.list-group-flush').children];
     parcelCards.forEach((parcelCard) => {
-        const uploadSignatureBtn = parcelCard.querySelector('div[data-type=signature]');
         const card = parcelCard.querySelector('.card');
+        const uploadSignatureBtn = parcelCard.querySelector('div[data-type=signature]')
         uploadSignatureBtn.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();

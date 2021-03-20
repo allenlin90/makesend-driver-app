@@ -15,9 +15,12 @@ window.onload = async function () {
     if (token) {
         const validToken = await checkToken(token);
         if (validToken) {
+            // window.location.hash = 'scanner';
             window.location.hash = 'search/phone';
             showheaders();
-            navigators();
+            // navigators('scanner');
+            navigators('search');
+            // qrScanner();
             searchFeatures();
         } else {
             userLogin();
@@ -27,14 +30,15 @@ window.onload = async function () {
     }
 
     window.onhashchange = async function () {
-        console.log('path changes!');
+        const hash = window.location.hash.toLowerCase();
+        console.log(`path changes! ${hash}`);
         const validToken = await checkToken();
         stopStream();
         hideHeaders();
         resetPasswordState();
         if (validToken) {
-            const hash = window.location.hash.toLowerCase();
             if (hash.includes(`#dashboard`)) {
+                // window.location.hash = 'scanner';
                 window.location.hash = 'search/phone';
             } else if (hash.includes(`#scanner`)) {
                 navigators('scanner');

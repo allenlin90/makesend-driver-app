@@ -7,7 +7,7 @@ const state = {
 }
 
 export function searchFeatures() {
-    
+
     const header = document.querySelector('header');
     header.style.display = `block`;
     header.innerHTML = `
@@ -34,22 +34,32 @@ export function searchFeatures() {
     const location = window.location.hash.split('?')[0];
     state.id = getParameterByName('id');
     state.parcelId = getParameterByName('parcelId');
+    let phoneBtnClass = 'warning';
+    let trackIdbtnClass = 'dark';
 
-    location.includes('trackingid') ? searchForm = searchInputByTrackingId : searchForm = searchInputByPhone;
+    if (location.includes('trackingid')) {
+        searchForm = searchInputByTrackingId;
+        phoneBtnClass = 'dark';
+        trackIdbtnClass = 'warning';
+    } else {
+        searchForm = searchInputByPhone;
+    }
 
     const container = document.querySelector('.container');
     container.style.justifyContent = `space-between`;
     container.innerHTML = `
     <div id="search_parcel">
         <div id="search_functions">
-            <div id="search_by_phone_btn" class="btn btn-warning">Receiver Phone</div>
-            <div id="search_by_tracking_id_btn" class="btn btn-dark">Tracking ID</div>
+            <div id="search_by_phone_btn" class="btn btn-${phoneBtnClass}">Receiver Phone</div>
+            <div id="search_by_tracking_id_btn" class="btn btn-${trackIdbtnClass}">Tracking ID</div>
         </div>
         <div id="search_list">
             <div id="search_bar">
                 ${searchForm}
             </div>            
-        </div>            
+        </div>
+        <div id="search_filters">
+        </div>
         <div id="result_list">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Please search parcel by <br> <b>Receiver Phone</b> or <br> <b>Tracking ID</b></li>
@@ -65,11 +75,11 @@ export function searchFeatures() {
         const searchBar = document.querySelector('#search_bar');
         searchBar.querySelector('input').value = state.id;
         searchParcelById(state.id);
-    }    
+    }
 
     const searchByPhoneBtn = document.querySelector('#search_by_phone_btn');
     const searchByTrackingIdBtn = document.querySelector('#search_by_tracking_id_btn');
-    
+
 
     searchByPhoneBtn.addEventListener('click', addSearchInput);
     searchByTrackingIdBtn.addEventListener('click', addSearchInput);
@@ -87,6 +97,8 @@ export function searchFeatures() {
             }
         });
         if (this.id === 'search_by_tracking_id_btn') {
+            document.querySelector('#search_by_tracking_id_btn').classList.add('btn-warning');
+            document.querySelector('#search_by_phone_btn').classList.add('btn-dark');
             window.location.hash = 'search/trackingid';
         } else if (this.id === 'search_by_phone_btn') {
             window.location.hash = 'search/phone';
