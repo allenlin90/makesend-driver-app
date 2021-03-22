@@ -9,6 +9,7 @@
 @import "forget_password.css";
 @import "reset_password.css";
 @import "user_setting.css";
+@import "qr_register.css";
 
 html, body {
     padding: 0;

@@ -4,13 +4,11 @@ import { getParameterByName } from './helpers.js';
 
 export async function actionsToQR(res = '') {
     // let res = document.querySelector('#outputData').innerText.trim().toLowerCase();
-    const parcelId = getParameterByName('id');
 
     const trackingIdRegex = /.?(([Ee][Xx]|[Ss][Tt]|[Pp]{2})\d{13}).?/g.exec(res);
     const outputData = document.querySelector('#output_data');
     const parcelStatus = document.querySelector('#parcel_status');
     parcelStatus.innerHTML = ``;
-    const actionToResult = document.querySelector('#actionToResult');
     if (trackingIdRegex) {
         const trackingId = trackingIdRegex[1].toUpperCase()
         if (res.includes('http')) {
@@ -20,6 +18,22 @@ export async function actionsToQR(res = '') {
         } else {
             outputData.innerText = trackingId;
         }
+        await actionsToParcelTypes(trackingId, parcelStatus);
+    } else {
+        if (res.includes('http') || res.includes('www')) {
+            outputData.innerHTML = `
+           <a href=${res}>${res}</a>
+        `;
+        } else {
+            outputData.innerText = res;
+        }
+    }
+}
+
+async function actionsToParcelTypes(trackingId = '', parcelStatusNode = null) {
+    if (trackingId) {
+        const parcelId = getParameterByName('id');
+        const actionToResult = document.querySelector('#actionToResult');
         actionToResult.style.display = `block`;
         const link = actionToResult.querySelector('a');
         if (trackingId.includes('ST')) {
@@ -29,13 +43,13 @@ export async function actionsToQR(res = '') {
             const checkRegistration = await checkPreprintId(trackingId);
             if (checkRegistration.resCode === 200 && checkRegistration.registered) {
                 const { status } = await checkParcelStatus(checkRegistration.trackingID);
-                actionsToDeliveryStatus(status.toLowerCase(), checkRegistration.trackingID, parcelStatus, link);
+                actionsToDeliveryStatus(status.toLowerCase(), checkRegistration.trackingID, parcelStatusNode, link);
             } else if (checkRegistration.resCode === 200) {
                 const param = parcelId ? `&parcelId=${parcelId}` : ``;
-                link.setAttribute('href', `#register?id=${trackingId}${param}`);
+                link.setAttribute('href', `#registerqr?id=${trackingId}${param}`);
                 link.innerText = `Register Parcel`;
                 if (param && param.includes('EX')) {
-                    window.location.hash = `register?id=${trackingId}${param}`;
+                    window.location.hash = `#registerqr?id=${trackingId}${param}`;
                 }
             } else {
                 console.log(checkRegistration.message);
@@ -44,15 +58,7 @@ export async function actionsToQR(res = '') {
             }
         } else if (trackingId.includes('EX')) {
             const { status } = await checkParcelStatus(trackingId);
-            actionsToDeliveryStatus(status.toLowerCase(), trackingId, parcelStatus, link);
-        }
-    } else {
-        if (res.includes('http') || res.includes('www')) {
-            outputData.innerHTML = `
-           <a href=${res}>${res}</a>
-        `;
-        } else {
-            outputData.innerText = res;
+            actionsToDeliveryStatus(status.toLowerCase(), trackingId, parcelStatusNode, link);
         }
     }
 }
@@ -162,16 +168,16 @@ export async function registerPreprintId(preprintId = '', trackingId = '') { //'
 export async function preprintIdCreator() {
     const UAT = localStorage.getItem('token');
     const headers = await generateHeaders();
-    const response = await fetch('https://api.airportels.ninja/api/msc/qr/preprint/generate', {
+    const response = await fetch(endpoints.createPreprintIdEndpoint, {
         method: 'post',
         mod: 'cors',
         responseType: 'json',
         headers: {
             'Content-Type': 'application/json',
-            'User-Token': `${UAT}`,
             'Client-Token': headers['Client-Token'],
             'Time-Stamp': headers['Time-Stamp'],
-            'Time-Signature': headers['Time-Signature']
+            'Time-Signature': headers['Time-Signature'],
+            'User-Token': `${UAT}`
         }
     })
         .then(res => res.json())

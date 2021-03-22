@@ -9,6 +9,7 @@ import { userSetting } from './userSetting.js';
 import { resetPassword, resetPasswordState } from './resetPassword.js';
 import { userProfileSetting } from './userProfile.js';
 import { aboutDriverApp } from './aboutSetting.js';
+import { qrRegister } from './qrRegister.js';
 
 window.onload = async function () {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -59,6 +60,8 @@ window.onload = async function () {
                     navigators('setting');
                     userSetting();
                 }
+            } else if (hash.includes(`#registerqr`)) {
+                qrRegister();
             } else {
                 window.location.hash = '';
             }

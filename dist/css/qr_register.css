@@ -1,0 +1,39 @@
+#register_qr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: calc(100% - 130px);
+    background-color: #fff;
+    margin-top: 4rem;
+    padding: 1rem;
+}
+
+#register_qr form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#loader {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#loader h4 {
+    margin: 0;
+    color: #ffc107;
+    font-weight: bold;
+}
+
+@media (min-width: 500px) {
+    #register_qr {
+        margin-top: 7rem;
+        max-width: 500px;
+        max-height: calc(100% - 130px - 6rem);
+    }
+}

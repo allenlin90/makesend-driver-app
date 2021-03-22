@@ -434,7 +434,7 @@ function resetPasswordForm() {
 function redirectCountdown(duration = 10) {
     const redirect = document.querySelector('#redirect_countdown');
     if (duration > 0) {
-        setTimeout(function () {
+        state.redirectCountdownTimer = setTimeout(function () {
             redirect.innerText = duration - 1;
             redirectCountdown(duration - 1)
         }, 1000);

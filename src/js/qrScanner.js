@@ -84,6 +84,8 @@ export async function qrScanner() {
     videoSelect.onchange = start;
     await checkDevices();
     await start();
+    // readResult('PP2103222259363');
+    // readResult('EX2103211733231'); // test by Aof
     // readResult('PP2103161318148'); // registered delivered
     // readResult('EX2103091044393'); // delivered
     // readResult('EX2012201138960'); // pending
