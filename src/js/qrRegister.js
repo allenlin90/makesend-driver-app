@@ -46,7 +46,7 @@ export function qrRegister(id = null, trackingId = null) {
     if (state.id) {
         preprintIdInput.value = state.id;
     }
-    if (state.id) {
+    if (state.trackingId) {
         trackingIdInput.value = state.trackingId;
     }
 
@@ -69,9 +69,16 @@ async function mapIds(event) {
         const response = await registerPreprintId(state.id, state.trackingId);
         console.log(response);
         if (response.resCode === 200) {
-            registerQRDiv.innerHTML = successAnimation(3);
-            redirectCountdown(3);
-            window.location.hash = `search/trackingid?id=${state.trackingId}`;
+            const duration = 3;
+            registerQRDiv.innerHTML = successAnimation(duration);
+            redirectCountdown(duration);
+            setTimeout(function () {
+                const trackingId = state.trackingId
+                state.redirectCountdownTimer = null;
+                state.id = '';
+                state.trackingId = '';
+                window.location.hash = `search/trackingid?id=${trackingId}`;
+            }, (duration * 1000));
         } else {
             console.log(response.message);
             alert(response.message);

@@ -32,6 +32,7 @@ export async function actionsToQR(res = '') {
 
 async function actionsToParcelTypes(trackingId = '', parcelStatusNode = null) {
     if (trackingId) {
+        const outputData = document.querySelector('#output_data');
         const parcelId = getParameterByName('id');
         const actionToResult = document.querySelector('#actionToResult');
         actionToResult.style.display = `block`;
@@ -45,7 +46,7 @@ async function actionsToParcelTypes(trackingId = '', parcelStatusNode = null) {
                 const { status } = await checkParcelStatus(checkRegistration.trackingID);
                 actionsToDeliveryStatus(status.toLowerCase(), checkRegistration.trackingID, parcelStatusNode, link);
             } else if (checkRegistration.resCode === 200) {
-                const param = parcelId ? `&parcelId=${parcelId}` : ``;
+                const param = parcelId ? `&trackingId=${parcelId}` : ``;
                 link.setAttribute('href', `#registerqr?id=${trackingId}${param}`);
                 link.innerText = `Register Parcel`;
                 if (param && param.includes('EX')) {
@@ -55,6 +56,7 @@ async function actionsToParcelTypes(trackingId = '', parcelStatusNode = null) {
                 console.log(checkRegistration.message);
                 alert(checkRegistration.message);
                 outputData.innerText = `Invalid Tracking ID ${trackingId}`;
+                actionToResult.style.display = `none`;
             }
         } else if (trackingId.includes('EX')) {
             const { status } = await checkParcelStatus(trackingId);

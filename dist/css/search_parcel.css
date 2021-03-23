@@ -58,6 +58,17 @@
     -webkit-overflow-scrolling: touch;
 }
 
+#result_list ul li > div > div > div {
+    display: flex;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#result_list ul li > div > div > div a {
+    text-decoration: none;
+    color: #fff;
+}
+
 #warning {
     position: absolute;
     left: 0;

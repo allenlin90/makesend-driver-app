@@ -1,9 +1,15 @@
 import { userToken, generateHeaders } from './checkToken.js';
 import endpoints from './endpoints.js';
+import {
+    state,
+    checkDeliveryStatus,
+    searchParcelByPhone,
+    searchParcelById
+} from './searchFunctions.js';
 
 const uploadEndpoint = endpoints.uploadEndpoint;
 
-const state = {
+const store = {
     files: [],
     compressedFiles: []
 }
@@ -76,9 +82,9 @@ export function createImageUploader(shipmentId) {
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height);
                         const srcEncoded = ctx.canvas.toDataURL(e.target, 'image/jpeg', 0.92);
-                        state.compressedFiles.push(srcEncoded);
-                        if (state.compressedFiles.length === files.length) {
-                            uploadImages(state.compressedFiles, upload);
+                        store.compressedFiles.push(srcEncoded);
+                        if (store.compressedFiles.length === files.length) {
+                            uploadImages(store.compressedFiles, upload);
                         }
                     }
                 }
@@ -90,7 +96,7 @@ export function createImageUploader(shipmentId) {
         const token = userToken();
         const headers = await generateHeaders();
         if (token) {
-            await fetch(uploadEndpoint, {
+            const response = await fetch(uploadEndpoint, {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json',
@@ -107,23 +113,29 @@ export function createImageUploader(shipmentId) {
                 })
             })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.resCode === 200 && data.result.length) {
-                        // need to inactivate buttons when the delivery status is delivered
-                        const image = data.result.length > 1 ? 'images' : 'image'
-                        const message = `upload ${data.result.length} ${image} for ${shipmentId} success!`;
-                        console.log(message);
-                        alert(message);
-                        fileInputs.clearPreviewPanel();
-                        removeImageUploader();
-                    } else {
-                        const message = `upload image for ${shipmentId} failed`;
-                        console.log(message);
-                        alert(message);
+                .then(data => data).catch(err => alert(err));
+            if (response.resCode === 200 && response.result.length) {
+                // need to inactivate buttons when the delivery status is delivered
+                const image = response.result.length > 1 ? 'images' : 'image'
+                const message = `upload ${response.result.length} ${image} for ${shipmentId} success!`;
+                const status = await checkDeliveryStatus(shipmentId);
+                console.log(state);
+                if (state[shipmentId] !== status) {
+                    if (/^\d{10}$/g.test(state.input)) {
+                        searchParcelByPhone(state.input);
+                    } else if (/^[eE][xX]\d{13}$/g.test(state.input)) {
+                        searchParcelById(state.input);
                     }
-                }).catch(err => {
-                    alert(err);
-                });
+                }
+                console.log(message);
+                alert(message);
+                fileInputs.clearPreviewPanel();
+                removeImageUploader();
+            } else {
+                const message = `upload image for ${shipmentId} failed`;
+                console.log(message);
+                alert(message);
+            }
         } else {
             alert('token is invalid!');
             userLogin();

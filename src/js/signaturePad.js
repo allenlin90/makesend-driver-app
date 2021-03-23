@@ -2,6 +2,12 @@ import { userToken, generateHeaders } from './checkToken.js';
 import { userLogin } from './userLogin.js';
 import endpoints from './endpoints.js';
 const uploadEndpoint = endpoints.uploadEndpoint;
+import {
+    state,
+    checkDeliveryStatus,
+    searchParcelByPhone,
+    searchParcelById
+} from './searchFunctions.js';
 
 export function createSignaturePad(shipmentId) {
     const footer = document.querySelector('footer')
@@ -169,7 +175,15 @@ export function createSignaturePad(shipmentId) {
             if (response.resCode === 200 && response.result.length) {
                 // need to inactivate buttons when the delivery status is delivered
                 const message = `upload signature for ${shipmentId} success!`;
-                console.log(message);
+                const status = await checkDeliveryStatus(shipmentId);
+                console.log(state);
+                if (state[shipmentId] !== status) {
+                    if (/^\d{10}$/g.test(state.input)) {
+                        searchParcelByPhone(state.input);
+                    } else if (/^[eE][xX]\d{13}$/g.test(state.input)) {
+                        searchParcelById(state.input);
+                    }
+                }
                 alert(message);
                 removeSignaturePad();
             } else {

@@ -5,10 +5,11 @@ import { generateHeaders } from './checkToken.js';
 const searchParcelByPhoneEndpoint = `${endpoints.searchParcelByPhone}`;
 const searchParcelByIdEndpoint = `${endpoints.searchParcelById}`;
 
-const state = {
+export const state = {
     input: '',
     timeoutId: null,
-    parcels: []
+    parcels: [],
+    allParcelStatus: null
 }
 
 export function handleSubmitEvent() {
@@ -43,7 +44,7 @@ function searchParcel() {
     }
 }
 
-async function searchParcelByPhone(phone) {
+export async function searchParcelByPhone(phone) {
     const validPhone = phone.match(/^0\d{9}/g);
     if (validPhone) {
         try {
@@ -62,11 +63,21 @@ async function searchParcelByPhone(phone) {
                     receiver_phone: phone
                 })
             }).then(res => res.json()).then(data => data);
+
+            state.allParcelStatus = searchResults.reduce((object, parcel) => {
+                object[parcel.shipmentID] = {
+                    id: parcel.shipmentID,
+                    status: parcel.status.toLowerCase()
+                };
+                return object
+            }, {});
+
             state.parcels = searchResults.map((parcel) => {
                 const serviceDate = new Date(Date.parse(parcel.service_date)).toLocaleDateString().split('/');
                 parcel.service_date = `${serviceDate[2]}-${serviceDate[0]}-${serviceDate[1]}`;
                 return parcel;
             });
+
             if (state.parcels.length) {
                 listResults();
             } else {
@@ -135,34 +146,7 @@ function listErrorResult() {
 }
 
 function listResults() {
-    console.log(state.parcels);
     const parcels = state.parcels.map(parcel => {
-        let btnType = ''
-        let btnActive = ''
-        switch (parcel.status.toLowerCase().trim()) {
-            case 'pending':
-            case 'in hub':
-            case 'delivering':
-            case 'delivering (delay)':
-            case 'returning':
-            case 're-deilvering':
-                btnType = 'primary';
-                break;
-            case 'delivered':
-            case 'delivered (delay)':
-            case 'returned':
-                btnType = 'primary';
-                btnActive = 'disabled';
-                break;
-            case 'canceled':
-            case 'failed delivery':
-            case 'not found':
-                btnType = 'danger';
-                btnActive = 'disabled';
-                break;
-            default:
-                btnType = 'primary';
-        }
         const item = `
         <li class="list-group-item">
             <div class="card" data-shipment-id="${parcel.shipmentID}">
@@ -173,8 +157,9 @@ function listResults() {
                     <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
                     <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
                     <p class="card-text">${parcel.note}</p>
-                    <div class="card-link btn btn-${btnType} ${btnActive}" data-type="photo">Photo</div>
-                    <div class="card-link btn btn-${btnType} ${btnActive}" data-type="signature">Singature</div>
+                    <div>
+                        ${showBtns(parcel.status.trim().toLowerCase(), parcel.shipmentID)}
+                    </div>
                 </div>
             </div>
         </li>
@@ -201,6 +186,54 @@ function listResults() {
     });
 }
 
+function showBtns(status = '', trackingId = '') {
+    if (status && trackingId) {
+        let buttons = ``;
+        let btnType = ``;
+        let btnActive = ``;
+        switch (status) {
+            case 'pending':
+            case 'in hub':
+            case 'delivering':
+            case 'delivering (delay)':
+            case 'returning':
+            case 're-deilvering':
+                btnType = 'primary';
+                break;
+            case 'delivered':
+            case 'delivered (delay)':
+            case 'returned':
+                btnType = 'primary';
+                btnActive = 'disabled';
+                break;
+            case 'canceled':
+            case 'failed delivery':
+            case 'not found':
+                btnType = 'danger';
+                btnActive = 'disabled';
+                break;
+            default:
+                btnType = 'primary';
+        }
+        buttons = `
+        <div class="card-link btn btn-${btnType} ${btnActive}" data-type="photo">Photo</div>
+        <div class="card-link btn btn-${btnType} ${btnActive}" data-type="signature">Singature</div>
+        <div class="card-link btn btn-${btnType} ${btnActive}">
+            <a href="#scanner?id=${trackingId}">
+                Scan_QR
+            </a>
+        </div>
+        <div class="card-link btn btn-${btnType} ${btnActive}">
+            <a href="#registerqr?trackingId=${trackingId}">
+                Pair_ID
+            </a>
+        </div>
+        `;
+        return buttons;
+    }
+    return null;
+}
+
 function errAlert(errMessage) {
     const header = document.querySelector('header');
     header.innerHTML = `
@@ -211,4 +244,28 @@ function errAlert(errMessage) {
     setTimeout(function () {
         header.innerHTML = ``;
     }, 30);
+}
+
+export async function checkDeliveryStatus(id = '') {
+    if (id) {
+        const headers = await generateHeaders();
+        const response = await fetch(searchParcelByIdEndpoint, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Token': `${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
+                'Client-Token': headers['Client-Token'],
+                'Time-Stamp': headers['Time-Stamp'],
+                'Time-Signature': headers['Time-Signature']
+            },
+            body: JSON.stringify({
+                trackingId: id
+            })
+        }).then(res => res.json()).then(data => data).catch(err => err);
+        if (response.length) {
+            return response[0].status.toLowerCase();
+        }
+    }
+    return null;
 }

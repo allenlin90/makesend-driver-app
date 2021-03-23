@@ -1,8 +1,15 @@
-import { handleSubmitEvent, handleInputEvent, searchParcelById } from './searchFunctions.js';
+import {
+    handleSubmitEvent,
+    handleInputEvent,
+    searchParcelById,
+    searchParcelByPhone
+} from './searchFunctions.js';
+
 import { getParameterByName } from './helpers.js';
 
 const state = {
     id: null,
+    phone: '',
     parcelId: null
 }
 
@@ -34,6 +41,7 @@ export function searchFeatures() {
     const location = window.location.hash.split('?')[0];
     state.id = getParameterByName('id');
     state.parcelId = getParameterByName('parcelId');
+    state.phone = getParameterByName('phone');
     let phoneBtnClass = 'warning';
     let trackIdbtnClass = 'dark';
 
@@ -75,6 +83,10 @@ export function searchFeatures() {
         const searchBar = document.querySelector('#search_bar');
         searchBar.querySelector('input').value = state.id;
         searchParcelById(state.id);
+    } else if (state.phone) {
+        const searchBar = document.querySelector('#search_bar');
+        searchBar.querySelector('input').value = state.phone;
+        searchParcelByPhone(state.phone);
     }
 
     const searchByPhoneBtn = document.querySelector('#search_by_phone_btn');
