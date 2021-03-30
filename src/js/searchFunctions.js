@@ -93,7 +93,7 @@ export async function searchParcelByPhone(phone) {
 }
 
 export async function searchParcelById(id) { // EX2101181126620
-    const shipmentId = /^[eE][xX]\d{13}/g.exec(id);
+    const shipmentId = /^([eE][xX]|[Ss][Tt])\d{13}/g.exec(id);
     if (shipmentId) {
         try {
             const headers = await generateHeaders();
@@ -111,11 +111,7 @@ export async function searchParcelById(id) { // EX2101181126620
                     trackingId: shipmentId[0]
                 })
             }).then(res => res.json()).then(data => data);
-            state.parcels = searchResults.map((parcel) => {
-                const serviceDate = new Date(Date.parse(parcel.service_date)).toLocaleDateString().split('/');
-                parcel.service_date = `${serviceDate[2]}-${serviceDate[0]}-${serviceDate[1]}`;
-                return parcel;
-            });
+            state.parcels = searchResults;
             if (state.parcels.length) {
                 listResults();
                 return searchResults;
@@ -147,24 +143,45 @@ function listErrorResult() {
 
 function listResults() {
     const parcels = state.parcels.map(parcel => {
-        const item = `
-        <li class="list-group-item">
-            <div class="card" data-shipment-id="${parcel.shipmentID}">
-                <div class="card-body">
-                    <h5 class="card-title">Parcel ID: ${parcel.shipmentID}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Service Date: ${parcel.service_date}</h6>
-                    <h6 class="card-subtitle mb-2 text-muted">Delivery Status: ${parcel.status}</h6>
-                    <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
-                    <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
-                    <p class="card-text">${parcel.note}</p>
-                    <div>
-                        ${showBtns(parcel.status.trim().toLowerCase(), parcel.shipmentID)}
+        if (/^[eE][xX]\d{13}/g.exec(parcel.shipmentID)) {
+            const item = `
+            <li class="list-group-item">
+                <div class="card" data-shipment-id="${parcel.shipmentID}">
+                    <div class="card-body">
+                        <h5 class="card-title">Parcel ID: ${parcel.shipmentID}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Service Date: ${parcel.service_date}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Delivery Status: ${parcel.status}</h6>
+                        <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
+                        <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
+                        <p class="card-text">${parcel.note}</p>
+                        <div>
+                            ${showBtns(parcel.status.trim().toLowerCase(), parcel.shipmentID)}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </li>
-        `;
-        return item;
+            </li>
+            `;
+            return item;
+        } else if (/^[Ss][Tt]\d{13}/g.exec(parcel.shipmentID)) {
+            console.log(parcel);
+            const created_at = new Date(Date.parse(parcel.created_at));
+            const createdAtTime = `${created_at.getDate()}/${created_at.getMonth() + 1}/${created_at.getFullYear()}`;
+            const item = `
+            <li class="list-group-item">
+                <div class="card" data-shipment-id="${parcel.shipmentID}">
+                    <div class="card-body">
+                        <h5 class="card-title">Parcel ID: ${parcel.shipmentID}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Delivery Status: ${parcel.status}</h6>
+                        <p class="card-text">Created at: ${createdAtTime}</p>
+                        <div>
+                            ${showBtns(parcel.status.trim().toLowerCase(), parcel.shipmentID)}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            `;
+            return item;
+        }
     }).join('');
     document.querySelector('#result_list ul').innerHTML = parcels;
     const parcelCards = [...document.querySelector('.list-group.list-group-flush').children];
@@ -236,14 +253,15 @@ function showBtns(status = '', trackingId = '') {
 
 function errAlert(errMessage) {
     const header = document.querySelector('header');
+    const content = header.innerHTML;
     header.innerHTML = `
     <div id="warning" class="alert alert-danger" role="alert">
         Something went wrong: ${errMessage}
     </div>
     `;
     setTimeout(function () {
-        header.innerHTML = ``;
-    }, 30);
+        header.innerHTML = `${content}`;
+    }, 3000);
 }
 
 export async function checkDeliveryStatus(id = '') {
