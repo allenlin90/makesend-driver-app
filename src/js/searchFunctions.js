@@ -57,7 +57,8 @@ export async function searchParcelByPhone(phone) {
                     'User-Token': `${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
                     'Client-Token': headers['Client-Token'],
                     'Time-Stamp': headers['Time-Stamp'],
-                    'Time-Signature': headers['Time-Signature']
+                    'Time-Signature': headers['Time-Signature'],
+                    credentials: 'makesend_sorting',
                 },
                 body: JSON.stringify({
                     receiver_phone: phone
@@ -105,7 +106,8 @@ export async function searchParcelById(id) { // EX2101181126620
                     'User-Token': `${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
                     'Client-Token': headers['Client-Token'],
                     'Time-Stamp': headers['Time-Stamp'],
-                    'Time-Signature': headers['Time-Signature']
+                    'Time-Signature': headers['Time-Signature'],
+                    credentials: 'makesend_sorting',
                 },
                 body: JSON.stringify({
                     trackingId: shipmentId[0]
@@ -144,16 +146,19 @@ function listErrorResult() {
 function listResults() {
     const parcels = state.parcels.map(parcel => {
         if (/^[eE][xX]\d{13}/g.exec(parcel.shipmentID)) {
+            const service_date = new Date(Date.parse(parcel.service_date));
             const item = `
             <li class="list-group-item">
                 <div class="card" data-shipment-id="${parcel.shipmentID}">
                     <div class="card-body">
                         <h5 class="card-title">Parcel ID: ${parcel.shipmentID}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Service Date: ${parcel.service_date}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Service Date: ${service_date.getDate()}-${service_date.getMonth() + 1}-${service_date.getFullYear()}</h6>
                         <h6 class="card-subtitle mb-2 text-muted">Delivery Status: ${parcel.status}</h6>
-                        <p class="card-text">${parcel.receiver_name} ${parcel.receiver_no}</p>
-                        <p class="card-text">${parcel.dropoff_address}, ${parcel.dropoff_district}, ${parcel.dropoff_province} ${parcel.dropoff_postcode}</p>
-                        <p class="card-text">${parcel.note}</p>
+                        <p class="card-text">Client:${parcel.receiver_name}</p>
+                        <p class="card-text">Phone:${parcel.receiver_no}</p>
+                        <p class="card-text">Address: ${parcel.dropoff_address}</p>
+                        <p class="card-text">${parcel.dropoff_district}, ${parcel.dropoff_province}, ${parcel.dropoff_postcode}</p>
+                        <p class="card-text">Note: ${parcel.note}</p>
                         <div>
                             ${showBtns(parcel.status.trim().toLowerCase(), parcel.shipmentID)}
                         </div>
@@ -235,16 +240,16 @@ function showBtns(status = '', trackingId = '') {
         buttons = `
         <div class="card-link btn btn-${btnType} ${btnActive}" data-type="photo">Photo</div>
         <div class="card-link btn btn-${btnType} ${btnActive}" data-type="signature">Singature</div>
-        <div class="card-link btn btn-${btnType} ${btnActive}">
+        <!-- <div class="card-link btn btn-${btnType} ${btnActive}">
             <a href="#scanner?id=${trackingId}">
                 Scan_QR
             </a>
         </div>
-        <div class="card-link btn btn-${btnType} ${btnActive}">
-            <a href="#registerqr?trackingId=${trackingId}">
+        <div class="card-link btn btn-${btnType} ${btnActive} disabled">
+            <a class="disabled" href="#registerqr?trackingId=${trackingId}">
                 Pair_ID
             </a>
-        </div>
+        </div> -->
         `;
         return buttons;
     }
@@ -275,7 +280,8 @@ export async function checkDeliveryStatus(id = '') {
                 'User-Token': `${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
                 'Client-Token': headers['Client-Token'],
                 'Time-Stamp': headers['Time-Stamp'],
-                'Time-Signature': headers['Time-Signature']
+                'Time-Signature': headers['Time-Signature'],
+                credentials: 'makesend_sorting',
             },
             body: JSON.stringify({
                 trackingId: id

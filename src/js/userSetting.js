@@ -29,6 +29,7 @@ export function userSetting() {
                         </div>
                     </a>
                 </li>
+                <!--
                 <li class="list-group-item">
                     <a href="#setting/resetpassword">
                         <div>
@@ -40,6 +41,7 @@ export function userSetting() {
                         </div>
                     </a>
                 </li>
+                -->
                 <li class="list-group-item">
                     <a href="#setting/about">
                         <div>

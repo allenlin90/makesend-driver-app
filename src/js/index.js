@@ -1,9 +1,10 @@
-import { userLogin } from './userLogin.js';
+import { login } from './login.js';
 import { navigators } from './footer.js';
 import { showheaders, hideHeaders } from './header.js';
 import { checkToken } from './checkToken.js';
 import { forgetPassword } from './forgetPassword.js';
 import { searchFeatures } from './searchParcel.js';
+import { taskList } from './taskList.js';
 import { qrScanner, stopStream } from './qrScanner.js';
 import { userSetting } from './userSetting.js';
 import { resetPassword, resetPasswordState } from './resetPassword.js';
@@ -16,18 +17,18 @@ window.onload = async function () {
     if (token) {
         const validToken = await checkToken(token);
         if (validToken) {
-            // window.location.hash = 'scanner';
-            window.location.hash = 'search/phone';
+            window.location.hash = 'tasks';
+            // window.location.hash = 'search/phone';
             showheaders();
-            // navigators('scanner');
-            navigators('search');
-            // qrScanner();
-            searchFeatures();
+            navigators('tasks');
+            // navigators('search');
+            taskList();
+            // searchFeatures();
         } else {
-            userLogin();
+            login();
         }
     } else {
-        userLogin();
+        login();
     }
 
     window.onhashchange = async function () {
@@ -39,8 +40,8 @@ window.onload = async function () {
         resetPasswordState();
         if (validToken) {
             if (hash.includes(`#dashboard`)) {
-                // window.location.hash = 'scanner';
-                window.location.hash = 'search/phone';
+                window.location.hash = 'tasks';
+                // window.location.hash = 'search/phone';
             } else if (hash.includes(`#scanner`)) {
                 navigators('scanner');
                 qrScanner();
@@ -49,6 +50,7 @@ window.onload = async function () {
                 searchFeatures();
             } else if (hash.includes(`#tasks`)) {
                 navigators('tasks');
+                taskList();
             } else if (hash.includes(`#setting`)) {
                 if (hash.includes(`userprofile`)) {
                     userProfileSetting();
@@ -71,7 +73,7 @@ window.onload = async function () {
                     forgetPassword();
                     break;
                 default:
-                    userLogin();
+                    login();
             }
         }
     }
