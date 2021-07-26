@@ -11,7 +11,7 @@ export function login() {
     container.innerHTML = `
         <div id="login_form">
             <div id="makesend_logo">
-                <img src="https://www.makesend.asia/wp-content/uploads/2018/06/logo-makesend.png" alt="ms_logo">
+                <img src="https://i2.wp.com/www.shipsmileservices.com/wp-content/uploads/2021/07/Logo-Makesend.png?resize=1080%2C864&ssl=1" alt="ms_logo">
             </div>
             <form action="" autocomplete="off">
                 <div class="mb-3">
@@ -19,14 +19,14 @@ export function login() {
                     <input class="form-control" id="phone" type="tel" name="receiver_phone" value="" inputmode="numeric" placeholder="#0632166699" autocomplete="off" required">
                     <div class="invalid-feedback">Your phone is not correct</div>
                     </div>
-                <div class="mb-3" style="display: flex; justify-content: space-between">
-                    <select id="year_selector" required style="text-align-last: center">
+                <div class="mb-3" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr))">
+                    <select id="year_selector" class="form-select" required style="text-align-last: center">
                         ${yearOptions}
                     </select>
-                    <select id="month_selector" required style="text-align-last: center">
+                    <select id="month_selector" class="form-select" required style="text-align-last: center">
                         ${monthOptions}
                     </select>
-                    <select id="date_selector" required style="text-align-last: center">
+                    <select id="date_selector" class="form-select" required style="text-align-last: center">
                         <option disabled selected="true" value="">Select a Date<option>
                     </select>
                 </div>
