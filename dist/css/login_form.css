@@ -9,6 +9,8 @@
 #login_form img {
     width: 80%;
     margin-bottom: 2rem;
+    display: block;
+    margin: 0 auto;
 }
 
 #login_form button {
